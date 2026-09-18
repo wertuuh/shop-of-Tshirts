@@ -1,0 +1,112 @@
+body{
+    background-color: rgb(255, 255, 255);
+    margin: 0;
+}
+.NameShop{
+    font-size: 35px;
+    text-align: center; 
+    margin-top: 25px;
+    color: black;
+    padding-bottom: 25px;
+}
+.ticker {
+  overflow: hidden;
+  background-color: black;
+  color: white;
+  padding: 12px 0;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 40s linear infinite;
+}
+
+.ticker-track span {
+  white-space: nowrap;
+  font-size: 18px;
+}
+
+.ticker-track span::after {
+  content: "|";
+  margin: 0 30px;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px 0;
+  margin-top: 25px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: black;
+  font-size: 20px;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  row-gap: 75px;
+}
+
+.card img {
+  width: 75%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+.card p {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.footer {
+  padding: 30px 0;
+  background-color: bisque;
+}
+
+.footer a {
+  text-decoration: none;
+  color: black;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-text {
+  text-align: center;
+  margin: 0 0 10px;
+}
+
+.contacts {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.last{
+    margin-top: 25px;
+}
