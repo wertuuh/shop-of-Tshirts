@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Белая худи — Gangshin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="NameShop"><a href="{{ url_for('main.index') }}">Gangshin</a></div>
+
+  <main class="product-page">
+    <a class="back" href="{{ url_for('main.index') }}">← Назад в каталог</a>
+
+    <div class="product">
+      <div class="product-photo">
+
+        <img src="{{ url_for('static', filename='images/HoodieTwo.jpg') }}" alt="Белая худи">
+      </div>
+
+      <div class="product-info">
+        <h1 class="product-title">Белая худи</h1>
+
+       <p class="product-price">4 000 ₽ <span class="old-price">2 490 ₽</span></p>
+
+        <p class="option-title">Размер</p>
+        <div class="sizes">
+          <label><input type="radio" name="size" value="S" checked> S</label>
+          <label><input type="radio" name="size" value="M"> M</label>
+          <label><input type="radio" name="size" value="L"> L</label>
+          <label><input type="radio" name="size" value="XL"> XL</label>
+          <label><input type="radio" name="size" value="2XL"> 2XL</label>
+        </div>
+
+        <button class="buy-btn">Добавить в корзину</button>
+
+        <div class="product-desc">
+          <p>Худи из плотного хлопка.</p>
+          <ul>
+            <li>Материал: хлопок 100%</li>
+            <li>Крой: oversize</li>
+            <li>Размеры: S, M, L, XL, 2XL</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

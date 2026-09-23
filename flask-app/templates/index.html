@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="NameShop">Gangshin</div>
+    <div class="ticker">
+        <div class="ticker-track">
+            <span>Gangshin: одежда для тех, кто не боится выделяться. Футболки и худи, уличный стиль без
+                компромиссов</span>
+            <span>Gangshin: одежда для тех, кто не боится выделяться. Футболки и худи, уличный стиль без
+                компромиссов</span>
+            <span>Gangshin: одежда для тех, кто не боится выделяться. Футболки и худи, уличный стиль без
+                компромиссов</span>
+            <span>Gangshin: одежда для тех, кто не боится выделяться. Футболки и худи, уличный стиль без
+                компромиссов</span>
+        </div>
+    </div>
+<!-- Git13 test -->
+    <nav class="menu">
+        <a href="#">Все</a>
+        <a href="#">Футболки</a>
+        <a href="#">Худи</a>
+    </nav>
+    <main>
+        <div class="products">
+            <div class="card">
+                <a href="{{ url_for('main.card_one') }}"><img src="{{ url_for('static', filename='images/TshirtOne.jpg') }}" alt="Розовая футболка">
+                <p>Розовая футболка</p>
+                <p class="price">1 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_two') }}"><img src="{{ url_for('static', filename='images/TshirtTwo.jpg') }}" alt="зеленая футболка">
+                <p>зеленая футболка</p>
+                <p class="price">2 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_three') }}"><img src="{{ url_for('static', filename='images/TshirtThree.jpg') }}" alt="синяя футболка">
+                <p>синяя футболка</p>
+                <p classs="price">3 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_four') }}"><img src="{{ url_for('static', filename='images/TshirtFour.jpg') }}" alt="бежевая футболка">
+                <p>бежевая футболка</p>
+                <p classs="price">4 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_five') }}"><img src="{{ url_for('static', filename='images/TshirtFive.jpg') }}" alt="Чёрная футболка с фиолетовым принтом">
+                <p>Чёрная футболка с принтом</p>
+                <p class="price">5 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_six') }}"><img src="{{ url_for('static', filename='images/TshirtSix.jpg') }}" alt="Коричневая футболка">
+                <p>Коричневая футболка</p>
+                <p class="price">6 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_seven') }}"><img src="{{ url_for('static', filename='images/TshirtSeven.jpg') }}" alt="Чёрная футболка с рисунком">
+                <p>Чёрная футболка с рисунком</p>
+                <p class="price">7 000 ₽</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="{{ url_for('main.card_eight') }}"><img src="{{ url_for('static', filename='images/TshirtEight.jpg') }}" alt="Тёмно-зелёная футболка">
+                <p>Тёмно-зелёная футболка</p>
+                <p class="price">8 000 ₽</p>
+                </a>
+            </div>
+
+             <div class="card">
+                <a href="{{ url_for('main.card_nine') }}"><img src="{{ url_for('static', filename='images/HoodieOne.jpg') }}" alt="Чёрная худи">
+                <p>Чёрная худи</p>
+                <p class="price">3 000 ₽</p>
+                </a>
+            </div>
+
+             <div class="card">
+                <a href="{{ url_for('main.card_ten') }}"><img src="{{ url_for('static', filename='images/HoodieTwo.jpg') }}" alt="Белая худи">
+                <p>Белая худи</p>
+                <p class="price">4 000 ₽</p>
+                </a>
+            </div>
+
+             <div class="card">
+                <a href="{{ url_for('main.card_eleven') }}"><img src="{{ url_for('static', filename='images/HoodieThree.jpg') }}" alt="Зеленая худи">
+                <p>Зеленая худи</p>
+                <p class="price">5 000 ₽</p>
+                </a>
+            </div>
+
+             <div class="card">
+                <a href="{{ url_for('main.card_twelve') }}"><img src="{{ url_for('static', filename='images/HoodieFour.jpg') }}" alt="Бежевая худи">
+                <p>Бежевая худи</p>
+                <p class="price">6 000 ₽</p>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="footer">
+        <div class="contacts">
+            <a href="https://vk.com/" target="_blank">ВК</a>
+            <a href="https://t.me/" target="_blank">Телеграм</a>
+            <a href="https://t.me/" target="_blank">Поддержка</a>
+        </div>
+        <div class="last">
+            <p class="footer-text">Серов Александр Сергеевич</p>
+            <p class="footer-text">ИНН 133767524213</p>
+        </div>
+    </div>
+</body>
+
+</html>
