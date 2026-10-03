@@ -1,4 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from werkzeug.security import generate_password_hash
+from sqlalchemy.exc import IntegrityError
+from extensions import db
+from models import User
+from forms import RegisterForm
 
 bp_main = Blueprint('main', __name__)
 
@@ -53,3 +58,23 @@ def card_eleven():
 @bp_main.route("/card-twelve")
 def card_twelve():
     return render_template("cardTwelve.html")
+
+@bp_main.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(
+            email=form.email.data,
+            password_hash=generate_password_hash(form.password.data),
+        )
+        db.session.add(user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            form.email.errors.append("Этот email уже зарегистрирован")
+        else:
+            flash("Успешная регистрация!")
+            return redirect(url_for("main.index"))
+
+    return render_template("register.html", form=form)

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация — Gangshin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="NameShop"><a href="{{ url_for('main.index') }}">Gangshin</a></div>
+
+    <main class="auth-page">
+        <h1>Регистрация</h1>
+
+        <form method="post" class="auth-form" novalidate>
+            {{ form.hidden_tag() }}
+
+            {% for e in form.csrf_token.errors %}
+            <p class="field-error">Сессия устарела, обновите страницу и повторите</p>
+            {% endfor %}
+
+            <label>Email
+                {{ form.email() }}
+            </label>
+            {% for e in form.email.errors %}
+            <p class="field-error">{{ e }}</p>
+            {% endfor %}
+
+            <label>Пароль
+                {{ form.password() }}
+            </label>
+            {% for e in form.password.errors %}
+            <p class="field-error">{{ e }}</p>
+            {% endfor %}
+
+            <label>Повторите пароль
+                {{ form.password2() }}
+            </label>
+            {% for e in form.password2.errors %}
+            <p class="field-error">{{ e }}</p>
+            {% endfor %}
+
+            <button class="buy-btn" type="submit">Зарегистрироваться</button>
+        </form>
+    </main>
+</body>
+
+</html>
