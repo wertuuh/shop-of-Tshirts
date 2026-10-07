@@ -1,13 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="ru">
-
+ 
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
+ 
 <body>
     <div class="NameShop">
+        <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина{% if cart_count %} <span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
         Gangshin
         <a class="auth-link" href="{{ url_for('main.register') }}">Регистрация</a>
     </div>
@@ -99,7 +101,7 @@
                     <p class="price">8 000 ₽</p>
                 </a>
             </div>
-
+ 
             <div class="card">
                 <a href="{{ url_for('main.card_nine') }}"><img
                         src="{{ url_for('static', filename='images/HoodieOne.jpg') }}" alt="Чёрная худи">
@@ -107,7 +109,7 @@
                     <p class="price">3 000 ₽</p>
                 </a>
             </div>
-
+ 
             <div class="card">
                 <a href="{{ url_for('main.card_ten') }}"><img
                         src="{{ url_for('static', filename='images/HoodieTwo.jpg') }}" alt="Белая худи">
@@ -115,7 +117,7 @@
                     <p class="price">4 000 ₽</p>
                 </a>
             </div>
-
+ 
             <div class="card">
                 <a href="{{ url_for('main.card_eleven') }}"><img
                         src="{{ url_for('static', filename='images/HoodieThree.jpg') }}" alt="Зеленая худи">
@@ -123,7 +125,7 @@
                     <p class="price">5 000 ₽</p>
                 </a>
             </div>
-
+ 
             <div class="card">
                 <a href="{{ url_for('main.card_twelve') }}"><img
                         src="{{ url_for('static', filename='images/HoodieFour.jpg') }}" alt="Бежевая худи">
@@ -131,10 +133,10 @@
                     <p class="price">6 000 ₽</p>
                 </a>
             </div>
-
+ 
         </div>
     </main>
-
+ 
     <div class="footer">
         <div class="contacts">
             <a href="https://vk.com/" target="_blank">ВК</a>
@@ -147,5 +149,5 @@
         </div>
     </div>
 </body>
-
+ 
 </html>

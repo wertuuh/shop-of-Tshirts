@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корзина — Gangshin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="NameShop">
+    <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина{% if cart_count %} <span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
+    <a href="{{ url_for('main.index') }}">Gangshin</a>
+  </div>
+
+  <main class="cart-page">
+    <a class="back" href="{{ url_for('main.index') }}">← Назад в каталог</a>
+    <h1>Корзина</h1>
+
+    {% if items %}
+      {% for it in items %}
+      <div class="cart-item">
+        <a href="{{ url_for(it.endpoint) }}"><img src="{{ url_for('static', filename='images/' ~ it.image) }}" alt="{{ it.name }}"></a>
+        <div class="cart-item-info">
+          <a href="{{ url_for(it.endpoint) }}">{{ it.name }}</a>
+          <div class="cart-item-size">Размер: {{ it.size }} · {{ it.price|rub }} ₽</div>
+        </div>
+        <div class="cart-qty">
+          <form method="post" action="{{ url_for('main.cart_update', product_id=it.id, size=it.size) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="qty-btn" name="action" value="dec" type="submit">−</button>
+          </form>
+          <span>{{ it.qty }}</span>
+          <form method="post" action="{{ url_for('main.cart_update', product_id=it.id, size=it.size) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="qty-btn" name="action" value="inc" type="submit">+</button>
+          </form>
+        </div>
+        <div class="cart-sum">{{ it.subtotal|rub }} ₽</div>
+        <form method="post" action="{{ url_for('main.cart_remove', product_id=it.id, size=it.size) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="qty-btn" type="submit" title="Удалить">✕</button>
+        </form>
+      </div>
+      {% endfor %}
+
+      <div class="cart-total">Итого: <b>{{ total|rub }} ₽</b></div>
+      <form method="post" action="{{ url_for('main.cart_clear') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="qty-btn" style="width:auto;padding:0 14px" type="submit">Очистить корзину</button>
+      </form>
+    {% else %}
+      <p class="cart-empty">Корзина пуста</p>
+    {% endif %}
+  </main>
+</body>
+</html>
