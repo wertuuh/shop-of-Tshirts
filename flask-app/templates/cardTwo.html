@@ -20,6 +20,9 @@
       <div class="product-info">
         <h1 class="product-title">зеленая футболка</h1>
         <p class="product-price">2 200 ₽ <span class="old-price">2 490 ₽</span></p>
+      
+      <form method="post" action="{{ url_for('main.cart_add', product_id=2) }}">
+       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <p class="option-title">Размер</p>
         <div class="sizes">
@@ -30,7 +33,9 @@
           <label><input type="radio" name="size" value="2XL"> 2XL</label>
         </div>
 
-        <button class="buy-btn">Добавить в корзину</button>
+        <button class="buy-btn" type="submit">Добавить в корзину</button>
+      </form>
+    
 
         <div class="product-desc">
           <p>Свободная футболка из плотного хлопка.</p>
