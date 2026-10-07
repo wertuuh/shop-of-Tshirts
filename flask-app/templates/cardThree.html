@@ -21,6 +21,9 @@
         <h1 class="product-title">Синяя футболка</h1>
         <p class="product-price">3 000 ₽ <span class="old-price"></span></p>
 
+      <form method="post" action="{{ url_for('main.cart_add', product_id=3) }}">
+       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <p class="option-title">Размер</p>
         <div class="sizes">
           <label><input type="radio" name="size" value="S" checked> S</label>
@@ -30,7 +33,8 @@
           <label><input type="radio" name="size" value="2XL"> 2XL</label>
         </div>
 
-        <button class="buy-btn">Добавить в корзину</button>
+        <button class="buy-btn" type="submit">Добавить в корзину</button>
+      </form> 
 
         <div class="product-desc">
           <p>Свободная футболка из плотного хлопка.</p>
