@@ -61,3 +61,4 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Пароль должен содержать минимум 2 цифры")
         if field.data.lower() == (self.email.data or ""):
             raise ValidationError("Пароль не должен совпадать с email")
+

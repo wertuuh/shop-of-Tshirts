@@ -328,3 +328,20 @@ body{
   .auth-link { right: 10px; font-size: 16px; }
   .cart-item { flex-wrap: wrap; }
 }
+/* ---------- Кнопка «Добавить в корзину» / счётчик на странице товара ---------- */
+.buy-box {
+  display: inline-block;
+}
+ 
+.qty-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+ 
+.qty-label {
+  font-size: 16px;
+  min-width: 110px;
+  text-align: center;
+}
+ 
