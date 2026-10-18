@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Розовая футболка — Gangshin</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
   <div class="NameShop"><a href="{{ url_for('main.index') }}">Gangshin</a></div>
 
@@ -21,27 +23,113 @@
         <h1 class="product-title">Бежевая футболка</h1>
         <p class="product-price">4 000 ₽ <span class="old-price">2 490 ₽</span></p>
 
-        <p class="option-title">Размер</p>
-        <div class="sizes">
-          <label><input type="radio" name="size" value="S" checked> S</label>
-          <label><input type="radio" name="size" value="M"> M</label>
-          <label><input type="radio" name="size" value="L"> L</label>
-          <label><input type="radio" name="size" value="XL"> XL</label>
-          <label><input type="radio" name="size" value="2XL"> 2XL</label>
-        </div>
+        <form method="post" action="{{ url_for('main.cart_add', product_id=4) }}" id="cart-form" data-product-id="4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <button class="buy-btn">Добавить в корзину</button>
 
-        <div class="product-desc">
-          <p>Свободная футболка из плотного хлопка.</p>
-          <ul>
-            <li>Материал: хлопок 100%</li>
-            <li>Крой: oversize</li>
-            <li>Размеры: S, M, L, XL, 2XL</li>
-          </ul>
-        </div>
+
+          <p class="option-title">Размер</p>
+          <div class="sizes">
+            <label><input type="radio" name="size" value="S" checked> S</label>
+            <label><input type="radio" name="size" value="M"> M</label>
+            <label><input type="radio" name="size" value="L"> L</label>
+            <label><input type="radio" name="size" value="XL"> XL</label>
+            <label><input type="radio" name="size" value="2XL"> 2XL</label>
+          </div>
+
+          <div class="buy-box" id="buy-box">
+            <noscript>
+              <button class="buy-btn" type="submit">Добавить в корзину</button>
+            </noscript>
+          </div>
+          <div class="product-desc">
+            <p>Свободная футболка из плотного хлопка.</p>
+            <ul>
+              <li>Материал: хлопок 100%</li>
+              <li>Крой: oversize</li>
+              <li>Размеры: S, M, L, XL, 2XL</li>
+            </ul>
+          </div>
       </div>
     </div>
   </main>
+  <script>
+    const cartQty = {{ cart_qty | tojson }};
+
+    (function () {
+      const form = document.getElementById('cart-form');
+      const productId = form.dataset.productId;
+      const buyBox = document.getElementById('buy-box');
+      const csrfToken = form.querySelector('input[name="csrf_token"]').value;
+
+      function currentSize() {
+        const checked = form.querySelector('input[name="size"]:checked');
+        return checked ? checked.value : null;
+      }
+
+      function post(url, params) {
+        const data = new FormData();
+        Object.entries(params).forEach(([key, value]) => data.append(key, value));
+        data.append('csrf_token', csrfToken);
+        return fetch(url, {
+          method: 'POST',
+          body: data,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(r => r.json());
+      }
+
+      function render(size) {
+        const qty = cartQty[size] || 0;
+        buyBox.innerHTML = '';
+
+        if (qty > 0) {
+          const box = document.createElement('div');
+          box.className = 'qty-box';
+
+          const minus = document.createElement('button');
+          minus.type = 'button';
+          minus.className = 'qty-btn';
+          minus.textContent = '−';
+          minus.addEventListener('click', () => {
+            post(`/cart/update/${productId}/${size}`, { action: 'dec' })
+              .then(res => { cartQty[size] = res.qty || 0; render(currentSize()); });
+          });
+
+          const label = document.createElement('span');
+          label.className = 'qty-label';
+          label.textContent = `В корзине: ${qty}`;
+
+          const plus = document.createElement('button');
+          plus.type = 'button';
+          plus.className = 'qty-btn';
+          plus.textContent = '+';
+          plus.addEventListener('click', () => {
+            post(`/cart/update/${productId}/${size}`, { action: 'inc' })
+              .then(res => { cartQty[size] = res.qty || 0; render(currentSize()); });
+          });
+
+          box.append(minus, label, plus);
+          buyBox.appendChild(box);
+        } else {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'buy-btn';
+          btn.textContent = 'Добавить в корзину';
+          btn.addEventListener('click', () => {
+            post(form.action, { size })
+              .then(res => { cartQty[size] = res.qty || 0; render(currentSize()); });
+          });
+          buyBox.appendChild(btn);
+        }
+      }
+
+      form.querySelectorAll('input[name="size"]').forEach(radio => {
+        radio.addEventListener('change', () => render(currentSize()));
+      });
+
+      render(currentSize());
+    })();
+  </script>
 </body>
+
 </html>
