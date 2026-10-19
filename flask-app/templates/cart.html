@@ -8,49 +8,128 @@
 </head>
 <body>
   <div class="NameShop">
-    <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина{% if cart_count %} <span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
+    <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge" id="cart-badge" style="{{ '' if cart_count else 'display:none' }}">{{ cart_count }}</span></a>
     <a href="{{ url_for('main.index') }}">Gangshin</a>
   </div>
-
+ 
   <main class="cart-page">
     <a class="back" href="{{ url_for('main.index') }}">← Назад в каталог</a>
     <h1>Корзина</h1>
-
-    {% if items %}
+ 
+    <div id="cart-items">
       {% for it in items %}
-      <div class="cart-item">
+      <div class="cart-item" id="cart-row-{{ it.id }}-{{ it.size }}" data-product-id="{{ it.id }}" data-size="{{ it.size }}">
         <a href="{{ url_for(it.endpoint) }}"><img src="{{ url_for('static', filename='images/' ~ it.image) }}" alt="{{ it.name }}"></a>
         <div class="cart-item-info">
           <a href="{{ url_for(it.endpoint) }}">{{ it.name }}</a>
           <div class="cart-item-size">Размер: {{ it.size }} · {{ it.price|rub }} ₽</div>
         </div>
         <div class="cart-qty">
-          <form method="post" action="{{ url_for('main.cart_update', product_id=it.id, size=it.size) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="qty-btn" name="action" value="dec" type="submit">−</button>
-          </form>
-          <span>{{ it.qty }}</span>
-          <form method="post" action="{{ url_for('main.cart_update', product_id=it.id, size=it.size) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="qty-btn" name="action" value="inc" type="submit">+</button>
-          </form>
+          <button class="qty-btn" type="button" data-action="dec">−</button>
+          <span class="qty-value">{{ it.qty }}</span>
+          <button class="qty-btn" type="button" data-action="inc">+</button>
         </div>
         <div class="cart-sum">{{ it.subtotal|rub }} ₽</div>
-        <form method="post" action="{{ url_for('main.cart_remove', product_id=it.id, size=it.size) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="qty-btn" type="submit" title="Удалить">✕</button>
-        </form>
+        <button class="qty-btn" type="button" data-action="remove" title="Удалить">✕</button>
       </div>
       {% endfor %}
-
-      <div class="cart-total">Итого: <b>{{ total|rub }} ₽</b></div>
-      <form method="post" action="{{ url_for('main.cart_clear') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="qty-btn" style="width:auto;padding:0 14px" type="submit">Очистить корзину</button>
-      </form>
-    {% else %}
-      <p class="cart-empty">Корзина пуста</p>
-    {% endif %}
+    </div>
+ 
+    <div class="cart-total" id="cart-total" {% if not items %}style="display:none"{% endif %}>
+      Итого: <b id="cart-total-value">{{ total|rub }} ₽</b>
+    </div>
+    <button class="qty-btn" style="width:auto;padding:0 14px" type="button" id="cart-clear-btn" {% if not items %}style="display:none"{% endif %}>
+      Очистить корзину
+    </button>
+ 
+    <p class="cart-empty" id="cart-empty" {% if items %}style="display:none"{% endif %}>Корзина пуста</p>
   </main>
+ 
+  <script>
+    const csrfToken = {{ csrf_token()|tojson }};
+ 
+    function rub(value) {
+      return Math.round(value).toLocaleString('ru-RU').replace(/\u00A0/g, ' ');
+    }
+ 
+    function post(url, params) {
+      const data = new FormData();
+      Object.entries(params).forEach(([key, value]) => data.append(key, value));
+      data.append('csrf_token', csrfToken);
+      return fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }).then(r => r.json());
+    }
+ 
+    function updateBadge(count) {
+      const badge = document.getElementById('cart-badge');
+      badge.textContent = count;
+      badge.style.display = count > 0 ? '' : 'none';
+    }
+ 
+    function updateTotal(total) {
+      document.getElementById('cart-total-value').textContent = rub(total) + ' ₽';
+    }
+ 
+    function checkEmpty() {
+      const itemsLeft = document.querySelectorAll('#cart-items .cart-item').length;
+      document.getElementById('cart-empty').style.display = itemsLeft ? 'none' : '';
+      document.getElementById('cart-total').style.display = itemsLeft ? '' : 'none';
+      document.getElementById('cart-clear-btn').style.display = itemsLeft ? '' : 'none';
+    }
+ 
+    document.getElementById('cart-items').addEventListener('click', function (e) {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const row = btn.closest('.cart-item');
+      const productId = row.dataset.productId;
+      const size = row.dataset.size;
+      const action = btn.dataset.action;
+ 
+      if (action === 'remove') {
+        post(`/cart/remove/${productId}/${size}`, {})
+          .then(res => {
+            if (!res.ok) return;
+            row.remove();
+            updateBadge(res.cart_count);
+            updateTotal(res.total);
+            checkEmpty();
+          });
+        return;
+      }
+ 
+      post(`/cart/update/${productId}/${size}`, { action: action })
+        .then(res => {
+          if (!res.ok) return;
+          if (res.qty > 0) {
+            row.querySelector('.qty-value').textContent = res.qty;
+            row.querySelector('.cart-sum').textContent = rub(res.subtotal) + ' ₽';
+          } else {
+            row.remove();
+          }
+          updateBadge(res.cart_count);
+          updateTotal(res.total);
+          checkEmpty();
+        });
+    });
+ 
+    document.getElementById('cart-clear-btn').addEventListener('click', function () {
+      post('/cart/clear', {}).then(res => {
+        if (!res.ok) return;
+        document.getElementById('cart-items').innerHTML = '';
+        updateBadge(res.cart_count);
+        updateTotal(res.total);
+        checkEmpty();
+      });
+    });
+ 
+    // Если страница восстановлена браузером из кэша (кнопка «назад»),
+    // данные на ней могут быть устаревшими — перезагружаем.
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) location.reload();
+    });
+  </script>
 </body>
 </html>

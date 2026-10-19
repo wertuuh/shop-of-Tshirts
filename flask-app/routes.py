@@ -23,6 +23,16 @@ def _size_qty_map(product_id):
     return {size: cart.get(f"{product_id}:{size}", 0) for size in SIZES}
  
  
+def _cart_total():
+    total = 0
+    for key, qty in _cart().items():
+        pid, _, _size = key.partition(":")
+        product = PRODUCTS.get(int(pid))
+        if product:
+            total += product["price"] * qty
+    return total
+ 
+ 
 def _wants_json():
     return request.headers.get("X-Requested-With") == "XMLHttpRequest"
  
@@ -139,7 +149,7 @@ def cart_add(product_id):
     session.modified = True
  
     if _wants_json():
-        return jsonify(ok=True, qty=cart[key], cart_count=sum(_cart().values()))
+        return jsonify(ok=True, qty=cart[key], cart_count=sum(_cart().values()), total=_cart_total())
  
     flash(f"Добавлено в корзину: {PRODUCTS[product_id]['name']}, размер {size}")
     return redirect(url_for(PRODUCTS[product_id]["endpoint"]))
@@ -158,7 +168,16 @@ def cart_update(product_id, size):
         session.modified = True
  
     if _wants_json():
-        return jsonify(ok=True, qty=cart.get(key, 0), cart_count=sum(_cart().values()))
+        qty = cart.get(key, 0)
+        product = PRODUCTS.get(product_id)
+        subtotal = product["price"] * qty if product else 0
+        return jsonify(
+            ok=True,
+            qty=qty,
+            subtotal=subtotal,
+            cart_count=sum(cart.values()),
+            total=_cart_total(),
+        )
  
     return redirect(url_for("main.cart"))
  
@@ -167,11 +186,18 @@ def cart_update(product_id, size):
 def cart_remove(product_id, size):
     _cart().pop(f"{product_id}:{size}", None)
     session.modified = True
+ 
+    if _wants_json():
+        return jsonify(ok=True, cart_count=sum(_cart().values()), total=_cart_total())
+ 
     return redirect(url_for("main.cart"))
  
  
 @bp_main.route("/cart/clear", methods=["POST"])
 def cart_clear():
     session.pop("cart", None)
-    return redirect(url_for("main.cart"))
  
+    if _wants_json():
+        return jsonify(ok=True, cart_count=0, total=0)
+ 
+    return redirect(url_for("main.cart"))
