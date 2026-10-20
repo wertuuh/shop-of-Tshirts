@@ -345,3 +345,7 @@ body{
   text-align: center;
 }
  
+.menu a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}

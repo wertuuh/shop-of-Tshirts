@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="ru">
- 
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
- 
+
 <body>
     <div class="NameShop">
-        <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge" id="cart-badge" style="{{ '' if cart_count else 'display:none' }}">{{ cart_count }}</span></a>
+        <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge" id="cart-badge"
+                style="{{ '' if cart_count else 'display:none' }}">{{ cart_count }}</span></a>
         Gangshin
         <a class="auth-link" href="{{ url_for('main.register') }}">Регистрация</a>
     </div>
@@ -24,11 +25,10 @@
                 компромиссов</span>
         </div>
     </div>
-    <!-- Git13 test -->
     <nav class="menu">
-        <a href="#">Все</a>
-        <a href="#">Футболки</a>
-        <a href="#">Худи</a>
+        <a href="#" data-filter="all" class="active">Все</a>
+        <a href="#" data-filter="tshirt">Футболки</a>
+        <a href="#" data-filter="hoodie">Худи</a>
     </nav>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -100,7 +100,7 @@
                     <p class="price">8 000 ₽</p>
                 </a>
             </div>
- 
+
             <div class="card">
                 <a href="{{ url_for('main.card_nine') }}"><img
                         src="{{ url_for('static', filename='images/HoodieOne.jpg') }}" alt="Чёрная худи">
@@ -108,7 +108,7 @@
                     <p class="price">3 000 ₽</p>
                 </a>
             </div>
- 
+
             <div class="card">
                 <a href="{{ url_for('main.card_ten') }}"><img
                         src="{{ url_for('static', filename='images/HoodieTwo.jpg') }}" alt="Белая худи">
@@ -116,7 +116,7 @@
                     <p class="price">4 000 ₽</p>
                 </a>
             </div>
- 
+
             <div class="card">
                 <a href="{{ url_for('main.card_eleven') }}"><img
                         src="{{ url_for('static', filename='images/HoodieThree.jpg') }}" alt="Зеленая худи">
@@ -124,7 +124,7 @@
                     <p class="price">5 000 ₽</p>
                 </a>
             </div>
- 
+
             <div class="card">
                 <a href="{{ url_for('main.card_twelve') }}"><img
                         src="{{ url_for('static', filename='images/HoodieFour.jpg') }}" alt="Бежевая худи">
@@ -132,10 +132,10 @@
                     <p class="price">6 000 ₽</p>
                 </a>
             </div>
- 
+
         </div>
     </main>
- 
+
     <div class="footer">
         <div class="contacts">
             <a href="https://vk.com/" target="_blank">ВК</a>
@@ -147,14 +147,28 @@
             <p class="footer-text">ИНН 133767524213</p>
         </div>
     </div>
- 
+
     <script>
-      // Если страница восстановлена из кэша браузера (кнопка «назад»),
-      // счётчик корзины на ней может быть устаревшим — перезагружаем.
-      window.addEventListener('pageshow', function (event) {
-        if (event.persisted) location.reload();
-      });
+        document.querySelectorAll('.menu a[data-filter]').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                var filter = link.dataset.filter;
+
+                document.querySelectorAll('.menu a[data-filter]').forEach(function (a) {
+                    a.classList.toggle('active', a === link);
+                });
+
+                document.querySelectorAll('.card').forEach(function (card) {
+                    var show = filter === 'all' || card.dataset.category === filter;
+                    card.style.display = show ? '' : 'none';
+                });
+            });
+        });
+
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) location.reload();
+        });
     </script>
 </body>
- 
+
 </html>
