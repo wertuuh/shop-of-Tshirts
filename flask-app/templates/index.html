@@ -11,7 +11,19 @@
         <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge" id="cart-badge"
                 style="{{ '' if cart_count else 'display:none' }}">{{ cart_count }}</span></a>
         Gangshin
-        <a class="auth-link" href="{{ url_for('main.register') }}">Регистрация</a>
+        <div class="header-right">
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Поиск по товарам"
+                    autocomplete="off">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
+                </svg>
+                <div id="search-suggestions" class="search-suggestions"></div>
+            </div>
+            <a class="auth-link" href="{{ url_for('main.register') }}">Регистрация</a>
+        </div>
     </div>
     <div class="ticker">
         <div class="ticker-track">
@@ -171,8 +183,41 @@
         applyFilter(sessionStorage.getItem('catalogFilter') || 'all');
 
 
+        const searchItems = {{ search_items | tojson }};
+        const searchInput = document.getElementById('search-input');
+        const searchSuggestions = document.getElementById('search-suggestions');
 
-        
+        function renderSuggestions(query) {
+            const q = query.trim().toLowerCase();
+            if (!q) {
+                searchSuggestions.style.display = 'none';
+                searchSuggestions.innerHTML = '';
+                return;
+            }
+
+            const matches = searchItems.filter(item => item.name.toLowerCase().includes(q));
+
+            searchSuggestions.innerHTML = matches.length
+                ? matches.slice(0, 8).map(item => `<a href="${item.url}">${item.name}</a>`).join('')
+                : '<div class="search-empty">Ничего не найдено</div>';
+
+            searchSuggestions.style.display = 'block';
+        }
+
+        searchInput.addEventListener('input', () => renderSuggestions(searchInput.value));
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim()) renderSuggestions(searchInput.value);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box')) {
+                searchSuggestions.style.display = 'none';
+            }
+        });
+
+
+
+
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) location.reload();
         });

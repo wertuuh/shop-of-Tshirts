@@ -49,7 +49,8 @@ def rub(value):
  
 @bp_main.route("/")
 def index():
-    return render_template("index.html")
+    search_items = [{"name": p["name"], "url": url_for(p["endpoint"])} for p in PRODUCTS.values()]
+    return render_template("index.html", search_items=search_items)
  
 @bp_main.route("/card-one")
 def card_one():
