@@ -21,7 +21,7 @@
 
       <div class="product-info">
         <h1 class="product-title">Синяя футболка</h1>
-        <p class="product-price">3 000 ₽ <span class="old-price"></span></p>
+        <p class="product-price">2 000 ₽ <span class="old-price">3 490 ₽</span></p>
 
         <form method="post" action="{{ url_for('main.cart_add', product_id=3) }}" id="cart-form" data-product-id="3">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
