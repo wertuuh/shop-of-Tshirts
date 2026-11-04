@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from extensions import db
-from models import User
-from forms import RegisterForm
+from models import User, Order, OrderItem
+from forms import RegisterForm, CheckoutForm
 from products import PRODUCTS, SIZES
  
 bp_main = Blueprint('main', __name__)
@@ -31,7 +31,24 @@ def _cart_total():
         if product:
             total += product["price"] * qty
     return total
- 
+
+def _cart_lines():
+    """Превращает корзину из session в готовый список товаров и итоговую сумму.
+    Возвращает два значения сразу: (items, total).
+    Это тот же самый цикл, что внутри функции cart() ниже, просто вынесенный
+    в отдельную функцию, чтобы использовать и в корзине, и при оформлении заказа."""
+    items, total = [], 0
+    for key, qty in _cart().items():
+        # ключ в корзине выглядит как "3:M", partition режет его по двоеточию на id и размер
+        pid, _, size = key.partition(":")
+        product = PRODUCTS.get(int(pid))
+        if not product:
+            continue
+        subtotal = product["price"] * qty
+        total += subtotal
+        # **product "распаковывает" словарь товара (name, price, image...) в этот же словарь
+        items.append({"id": int(pid), "size": size, "qty": qty, "subtotal": subtotal, **product})
+    return items, total
  
 def _wants_json():
     return request.headers.get("X-Requested-With") == "XMLHttpRequest"
@@ -202,3 +219,51 @@ def cart_clear():
         return jsonify(ok=True, cart_count=0, total=0)
  
     return redirect(url_for("main.cart"))
+
+@bp_main.route("/checkout", methods=["GET", "POST"])
+def checkout():
+    items, total = _cart_lines()
+    if not items:
+        return redirect(url_for("main.cart"))
+
+    form = CheckoutForm()
+
+    if form.validate_on_submit():
+        order = Order(
+            name=form.name.data,
+            phone=form.phone.data,
+            email=form.email.data,
+            address=form.address.data,
+            comment=form.comment.data or "",
+            total=total,
+        )
+        for it in items:
+            order.items.append(OrderItem(
+                product_id=it["id"],
+                product_name=it["name"],
+                size=it["size"],
+                qty=it["qty"],
+                price=it["price"],
+            ))
+
+        db.session.add(order)
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash("Не получилось сохранить заказ, попробуйте ещё раз")
+        else:
+            session.pop("cart", None)
+            session["last_order_id"] = order.id
+            return redirect(url_for("main.order_success", order_id=order.id))
+    return render_template("checkout.html", form=form, items=items, total=total)
+
+@bp_main.route("/order/<int:order_id>/success")
+def order_success(order_id):
+    if session.get("last_order_id") != order_id:
+        return redirect(url_for("main.index"))
+    order = db.session.get(Order, order_id)
+    if order is None:
+        return redirect(url_for("main.index"))
+
+    return render_template("order_success.html", order=order)
