@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заказ оформлен | Gangshin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="NameShop">
+    <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge" style="{{ '' if cart_count else 'display:none' }}">{{ cart_count }}</span></a>
+    <a href="{{ url_for('main.index') }}">Gangshin</a>
+  </div>
+
+  <main class="checkout-page">
+    <div class="success-box">
+      <h1>Спасибо за заказ!</h1>
+      <p class="success-number">Заказ № {{ order.id }}</p>
+      <p>{{ order.name }}, мы приняли ваш заказ и свяжемся с вами по телефону {{ order.phone }}, чтобы подтвердить его.</p>
+
+      <div class="order-summary success-details">
+        <h2>Состав заказа</h2>
+        {% for it in order.items %}
+        <div class="summary-row">
+          <span>{{ it.product_name }}, размер {{ it.size }} × {{ it.qty }}</span>
+          <span>{{ (it.price * it.qty)|rub }} ₽</span>
+        </div>
+        {% endfor %}
+        <div class="summary-total">
+          <span>Итого</span>
+          <b>{{ order.total|rub }} ₽</b>
+        </div>
+
+        <p class="success-line"><b>Адрес доставки.</b> {{ order.address }}</p>
+        <p class="success-line"><b>Email.</b> {{ order.email }}</p>
+        {% if order.comment %}
+        <p class="success-line"><b>Комментарий.</b> {{ order.comment }}</p>
+        {% endif %}
+      </div>
+
+      <a class="buy-btn success-btn" href="{{ url_for('main.index') }}">Вернуться в каталог</a>
+    </div>
+  </main>
+</body>
+</html>
