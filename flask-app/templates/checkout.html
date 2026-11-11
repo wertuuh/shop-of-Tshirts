@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Оформление заказа | Gangshin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Шапка такая же, как в корзине. cart_count приходит сам, из inject_cart_count в routes.py -->
+  <div class="NameShop">
+    <a class="cart-link" href="{{ url_for('main.cart') }}">Корзина <span class="cart-badge">{{ cart_count }}</span></a>
+    <a href="{{ url_for('main.index') }}">Gangshin</a>
+  </div>
+
+  <main class="checkout-page">
+    <a class="back" href="{{ url_for('main.cart') }}">← Назад в корзину</a>
+    <h1>Оформление заказа</h1>
+
+    <!-- Сюда попадают сообщения из flash(), например "Не получилось сохранить заказ".
+         Класс flash уже есть в style.css. -->
+    {% with messages = get_flashed_messages() %}
+      {% for m in messages %}
+        <div class="flash">{{ m }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="checkout-layout">
+
+      <!-- Левая колонка, форма. method="post" значит, что данные уйдут запросом POST.
+           novalidate выключает проверки самого браузера, чтобы работали наши, из forms.py.
+           Без action форма отправится на тот же адрес, где открыта, то есть на /checkout. -->
+      <form method="post" class="auth-form checkout-form" novalidate>
+        <!-- hidden_tag() выводит скрытое поле с CSRF-токеном. Без него сервер отклонит форму. -->
+        {{ form.hidden_tag() }}
+
+        {% for e in form.csrf_token.errors %}
+        <p class="field-error">Сессия устарела, обновите страницу и повторите</p>
+        {% endfor %}
+
+        <!-- form.name() рисует готовый <input>. Всё, что передаём в скобках
+             (placeholder, autocomplete), превращается в атрибуты тега. -->
+        <label>Имя
+          {{ form.name(autocomplete="name") }}
+        </label>
+        <!-- form.name.errors это список ошибок этого поля. Если всё хорошо, он пустой и цикл ничего не выведет. -->
+        {% for e in form.name.errors %}
+        <p class="field-error">{{ e }}</p>
+        {% endfor %}
+
+        <label>Телефон
+          {{ form.phone(placeholder="+7 999 123-45-67", autocomplete="tel") }}
+        </label>
+        {% for e in form.phone.errors %}
+        <p class="field-error">{{ e }}</p>
+        {% endfor %}
+
+        <label>Email
+          {{ form.email(autocomplete="email") }}
+        </label>
+        {% for e in form.email.errors %}
+        <p class="field-error">{{ e }}</p>
+        {% endfor %}
+
+        <label>Адрес доставки
+          {{ form.address(placeholder="Город, улица, дом, квартира", autocomplete="street-address") }}
+        </label>
+        {% for e in form.address.errors %}
+        <p class="field-error">{{ e }}</p>
+        {% endfor %}
+
+        <label>Комментарий к заказу (необязательно)
+          {{ form.comment(rows=4) }}
+        </label>
+        {% for e in form.comment.errors %}
+        <p class="field-error">{{ e }}</p>
+        {% endfor %}
+
+        <button class="buy-btn" type="submit">Подтвердить заказ</button>
+      </form>
+
+      <!-- Правая колонка, что человек покупает. items и total передали из функции checkout() -->
+      <aside class="order-summary">
+        <h2>Ваш заказ</h2>
+        {% for it in items %}
+        <div class="summary-row">
+          <span>{{ it.name }}, размер {{ it.size }} × {{ it.qty }}</span>
+          <span>{{ it.subtotal|rub }} ₽</span>
+        </div>
+        {% endfor %}
+        <div class="summary-total">
+          <span>Итого</span>
+          <b>{{ total|rub }} ₽</b>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+</body>
+</html>
